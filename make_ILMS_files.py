@@ -168,6 +168,7 @@ def makeCSVs(file):
                     centre_num = line[10:15]
                     #print(centre_num)
                     csvName = centre_num + "_Page" + pageName +".csv" #construct filename for all the individual csvs
+                    #csvName = centre_num + ".csv"  # construct filename for all the individual csvs
                 # the below regex finds 4 digits so these lines are the candidate data
                 elif re.search(r'\b\d\d\d\d\b', line) and "PEARSON EDEXCEL GCSE EXAMINATIONS" not in line: # find 4digit using regex
                     candNum = line[10:14] # extract cand Num

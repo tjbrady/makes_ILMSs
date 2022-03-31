@@ -36,7 +36,7 @@ def makeExcel(file):
     markWidth = 10 # column width for all mark columns
     ws.column_dimensions['A'].width = 20 # colA set to 20
     ws.column_dimensions['B'].width = 33 # ColB set to 33
-    ws.column_dimensions['C'].width = markWidth
+    ws.column_dimensions['C'].width = 16
     ws.column_dimensions['D'].width = markWidth
     ws.column_dimensions['E'].width = markWidth
     ws.column_dimensions['F'].width = markWidth
@@ -50,6 +50,7 @@ def makeExcel(file):
     ws.column_dimensions['N'].width = markWidth
     ws.column_dimensions['O'].width = markWidth
     ws.column_dimensions['P'].width = markWidth
+    ws.column_dimensions['Q'].width = markWidth
 
 
     # set background colours for TL form and heading for table
@@ -61,14 +62,14 @@ def makeExcel(file):
             cell.fill = PatternFill(start_color=yellow, end_color=yellow, fill_type="solid")
 
 
-    ws.cell(row=12, column=3).font = Font(bold=True) # set bold font for Original Examiner
-    ws.cell(row=12, column=10).font = Font(bold=True) # set bold font for Modified marks
-    ws.cell(row=12, column=3).fill= PatternFill(start_color=ltGreen, end_color=ltGreen, fill_type="solid") # ltGreen for Original Examiner
-    ws.cell(row=12, column=10).fill = PatternFill(start_color=pink, end_color=pink, fill_type="solid") # pink for Modified Marks
+    ws.cell(row=12, column=4).font = Font(bold=True) # set bold font for Original Examiner
+    ws.cell(row=12, column=11).font = Font(bold=True) # set bold font for Modified marks
+    ws.cell(row=12, column=4).fill= PatternFill(start_color=ltGreen, end_color=ltGreen, fill_type="solid") # ltGreen for Original Examiner
+    ws.cell(row=12, column=11).fill = PatternFill(start_color=pink, end_color=pink, fill_type="solid") # pink for Modified Marks
  
 
-    ws.merge_cells("c12:I12") # Merged cells for Original Examiner
-    ws.merge_cells("j12:p12") # Merged cells for Modified Marks
+    ws.merge_cells("d12:j12") # Merged cells for Original Examiner
+    ws.merge_cells("k12:q12") # Merged cells for Modified Marks
 
     # set thick black lines for TL and Assessor signoff table
     black = "00000000"
@@ -83,7 +84,7 @@ def makeExcel(file):
     ws["B10"].border = Border(top=thick, left=thick, right=thick, bottom=thick)
 
     # variable to set range for creating the table
-    tabRng = "A13:p" + str(bottomRow)
+    tabRng = "A13:q" + str(bottomRow)
 
     tab = Table(displayName="Table1", ref=tabRng, autoFilter=None) # the autofilter here was attempt to not have filter - didnt work
 
@@ -105,17 +106,17 @@ def makeExcel(file):
 
     # insert if formula for summing original marks unless a mod was made by TL
     rowNum = 14
-    for rows in ws.iter_rows(min_row=14, max_row=bottomRow, min_col=3, max_col=3):
+    for rows in ws.iter_rows(min_row=14, max_row=bottomRow, min_col=4, max_col=4):
         for cell in rows:
-            cell.value = ("=if(J" + str(rowNum) +"=0,SUM(D" + str(rowNum) + ":I" + str(rowNum) + "),\"Changed\")")
+            cell.value = ("=if(K" + str(rowNum) +"=0,SUM(E" + str(rowNum) + ":J" + str(rowNum) + "),\"Changed\")")
             cell.alignment = Alignment(horizontal='center')
             rowNum = rowNum +1
 
     # insert formula for summing modified marks unless a mod was made by TL
     rowNum = 14
-    for rows in ws.iter_rows(min_row=14, max_row=bottomRow, min_col=10, max_col=10):
+    for rows in ws.iter_rows(min_row=14, max_row=bottomRow, min_col=11, max_col=11):
         for cell in rows:
-            cell.value = ("=SUM(K" + str(rowNum) + ":P" + str(rowNum) + ")")
+            cell.value = ("=SUM(L" + str(rowNum) + ":Q" + str(rowNum) + ")")
             cell.alignment = Alignment(horizontal='center')
             rowNum = rowNum +1
 
@@ -158,7 +159,7 @@ def makeCSVs(file):
             # work through each page a pdf line at a time
             for line in text.split('\n'):
                 if "CANDIDATES:" in line: # insert into csv new table and columns for ilms
-                    line_str = 'TeamLeader\nTLsignoff\nAssName\nAssSignoff\n\n,,Original Examiner,,,,,,,Team Leader Marks\nCandNum,CandName,Tot,Q1mark,Q2mark,Q3mark,Q4mark,Q5mark,Q6mark,TotNew,Q1_New,Q2_New,Q3_New,Q4_New,Q5_New,Q6_New\n'
+                    line_str = 'TeamLeader Name\nTLsignoff\nAA Name\nAA Number\n\n,,,Original Examiner,,,,,,,Team Leader Marks\nCandNum,CandName,Present/Absent,Tot,Q1mark,Q2mark,Q3mark,Q4mark,Q5mark,Q6mark,TotNew,Q1_New,Q2_New,Q3_New,Q4_New,Q5_New,Q6_New\n'
                 elif "SUBJECT:" in line or "PAPER:" in line: # tidy up line with subject in it
                     line_str = line.lstrip()
                     line_str = line_str.replace(":",",") + "\n"
